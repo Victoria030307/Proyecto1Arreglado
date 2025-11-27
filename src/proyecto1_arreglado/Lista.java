@@ -76,19 +76,20 @@ public boolean insertar(String dato) {
     }
     
 
-public String getNombres() {
-    String nombres = "";
-    Nodo aux = this.primero;
-    
-    while (aux.siguiente != null) {
-        nombres+= aux.usuario + ","; 
-        aux = aux.siguiente;
+public String[] getNombres() {
+        if (this.size == 0) {
+            return new String[0];
+        }
+        String[] nombres = new String[this.size];
+        Nodo aux = this.primero;
+        int i = 0;
+        while (aux != null) {
+            nombres[i] = aux.usuario;
+            aux = aux.siguiente;
+            i++;
+        }
+        return nombres;
     }
-    nombres+= aux.usuario;
-    
-    return nombres; 
-}
-    
     public String mostrar (){
         String lista = "";
         Nodo aux = this.primero;
