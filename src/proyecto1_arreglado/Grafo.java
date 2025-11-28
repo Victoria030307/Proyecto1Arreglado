@@ -22,138 +22,215 @@ Tiene un arreglo con todos los vertices que existen en el grafo
 */
 public class Grafo {
     int num_vertices;
-    List<Vertice> usuarios;
+    Vertice[] usuarios; 
+    private int capacidad;
     
     public Grafo(int num){
-        this.usuarios = new ArrayList<>();
+        this.capacidad = (num > 0) ? num : 10;
+        this.usuarios = new Vertice[this.capacidad];
         this.num_vertices = 0;
     }
     
-    public List<Vertice> getVertices() {
-        return this.usuarios; 
+    public Vertice[] getVertices() {
+        Vertice[] verticesActuales = new Vertice[this.num_vertices];
+        for (int i = 0; i < this.num_vertices; i++) {
+            verticesActuales[i] = this.usuarios[i];
+        }
+        return verticesActuales; 
     }
     
-    
-    
     public Vertice buscarUsuario(String nombre){
-        for(Vertice v: this.usuarios){
-            if(v.usuario.equals(nombre)){
-                return v;
+        for(int i = 0; i < this.num_vertices; i++){
+            if(this.usuarios[i].usuario.equals(nombre)){
+                return this.usuarios[i];
             }
         }
         return null;
     }
-    
-public boolean eliminar(String usuario) {
-    Vertice v = buscarUsuario(usuario);
-    if (v == null) {
-        return false; 
-    }
-    this.usuarios.removeIf(u -> u.usuario.equals(usuario));
 
-    for (Vertice vRestante : this.usuarios) {
-        vRestante.adyacentes.eliminar(usuario);
+    private void asegurarCapacidad() {
+        if (this.num_vertices == this.capacidad) {
+            this.capacidad *= 2;
+            Vertice[] nuevoArreglo = new Vertice[this.capacidad];
+            for (int i = 0; i < this.num_vertices; i++) {
+                nuevoArreglo[i] = this.usuarios[i];
+            }
+            this.usuarios = nuevoArreglo;
+        }
     }
-    this.num_vertices = this.usuarios.size();
-    return true; 
-}
     
- public boolean insertar(String usuario){
-    if (buscarUsuario(usuario) != null) {
-        return false; 
+    public boolean eliminar(String usuario) {
+        int indiceAEliminar = -1;
+        for (int i = 0; i < this.num_vertices; i++) {
+            if (this.usuarios[i].usuario.equals(usuario)) {
+                indiceAEliminar = i;
+                break;
+            }
+        }
+        
+        if (indiceAEliminar == -1) {
+            return false;
+        }
+        
+        if (indiceAEliminar != this.num_vertices - 1) {
+            this.usuarios[indiceAEliminar] = this.usuarios[this.num_vertices - 1];
+        }
+        this.usuarios[this.num_vertices - 1] = null;
+        this.num_vertices--;
+        
+        for (int i = 0; i < this.num_vertices; i++) {
+            this.usuarios[i].adyacentes.eliminar(usuario);
+        }
+        return true;
     }
-    Vertice nuevoVertice = new Vertice(usuario);
-    this.usuarios.add(nuevoVertice);
-    this.num_vertices = this.usuarios.size();
-    return true; 
-}
+    
+    public boolean insertar(String usuario){
+        if (buscarUsuario(usuario) != null) {
+            return false;
+        }
+        asegurarCapacidad();
+        Vertice nuevoVertice = new Vertice(usuario);
+        this.usuarios[this.num_vertices] = nuevoVertice;
+        this.num_vertices++;
+        return true;
+    }
 
-public boolean agregarArista(String origen, String destino) {
-    Vertice vOrigen = buscarUsuario(origen);
-    Vertice vDestino = buscarUsuario(destino);
-    if (vOrigen != null && vDestino != null) {
-        return vOrigen.adyacentes.insertar(vDestino.usuario);
+    public boolean agregarArista(String origen, String destino) {
+        Vertice vOrigen = buscarUsuario(origen);
+        Vertice vDestino = buscarUsuario(destino);
+        if (vOrigen != null && vDestino != null) {
+            return vOrigen.adyacentes.insertar(vDestino.usuario);
+        }
+        return false;
     }
-    return false; 
-}
 
     public Grafo getTranspuesto() {
         Grafo gTranspuesto = new Grafo(this.num_vertices);
 
-        for (Vertice v : this.getVertices()) {
-            gTranspuesto.insertar(v.usuario);
+        for (int i = 0; i < this.num_vertices; i++) {
+            gTranspuesto.insertar(this.usuarios[i].usuario);
         }
 
-        for (Vertice v : this.getVertices()) {
-            for (String adyacente : v.adyacentes.getNombres()) {
+        for (int i = 0; i < this.num_vertices; i++) {
+            Vertice v = this.usuarios[i];
+            String[] adyacentes = v.adyacentes.getNombres();
+            for (String adyacente : adyacentes) {
                 gTranspuesto.agregarArista(adyacente, v.usuario);
             }
         }
         return gTranspuesto;
     }
+    
+    private boolean contieneString(String[] arreglo, int numElementos, String str) {
+        for (int i = 0; i < numElementos; i++) {
+            if (arreglo[i].equals(str)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    private void dfsPaso1(Vertice v, Set<String> visitados, Stack<Vertice> pila) {
-        visitados.add(v.usuario);
-        for (String nombreAdyacente : v.adyacentes.getNombres()) {
+    private int agregarString(String[] arreglo, int numElementos, String str) {
+        if (!contieneString(arreglo, numElementos, str)) {
+            arreglo[numElementos] = str;
+            return numElementos + 1;
+        }
+        return numElementos;
+    }
+
+    private void limpiarVisitados() {
+        for (int i = 0; i < this.num_vertices; i++) {
+            this.usuarios[i].visitado = false;
+        }
+    }
+
+    private void dfsPaso1(Vertice v, String[] visitadosArr, int[] numVisitados, Pila pila) {
+        numVisitados[0] = agregarString(visitadosArr, numVisitados[0], v.usuario);
+        
+        String[] nombresAdyacentes = v.adyacentes.getNombres();
+        for (String nombreAdyacente : nombresAdyacentes) {
             Vertice vAdyacente = this.buscarUsuario(nombreAdyacente);
-            if (vAdyacente != null && !visitados.contains(vAdyacente.usuario)) {
-                dfsPaso1(vAdyacente, visitados, pila);
+            if (vAdyacente != null && !contieneString(visitadosArr, numVisitados[0], vAdyacente.usuario)) {
+                dfsPaso1(vAdyacente, visitadosArr, numVisitados, pila);
             }
         }
         pila.push(v);
     }
 
-    private void dfsPaso2(Vertice v, Set<String> visitados, List<Vertice> componenteActual) {
-        visitados.add(v.usuario);
-        componenteActual.add(v); 
-        for (String nombreAdyacente : v.adyacentes.getNombres()) {
+    private void dfsPaso2(Vertice v, String[] visitadosArr, int[] numVisitados, Vertice[] componenteActualArr, int[] numComponente) {
+        numVisitados[0] = agregarString(visitadosArr, numVisitados[0], v.usuario);
+        
+        if (numComponente[0] < componenteActualArr.length) {
+            componenteActualArr[numComponente[0]] = v;
+            numComponente[0]++;
+        }
+        
+        String[] nombresAdyacentes = v.adyacentes.getNombres();
+        for (String nombreAdyacente : nombresAdyacentes) {
             Vertice vAdyacente = this.buscarUsuario(nombreAdyacente);
-            if (vAdyacente != null && !visitados.contains(vAdyacente.usuario)) {
-                dfsPaso2(vAdyacente, visitados, componenteActual);
+            if (vAdyacente != null && !contieneString(visitadosArr, numVisitados[0], vAdyacente.usuario)) {
+                dfsPaso2(vAdyacente, visitadosArr, numVisitados, componenteActualArr, numComponente);
             }
         }
     }
 
-       //mediante los pasos ya realizados se encuentran los componentes fuertemente conectados
-
-    public List<List<Vertice>> encontrarComponentesFuertementeConectados() {
-        Stack<Vertice> pila = new Stack<>();
-        Set<String> visitados = new HashSet<>();
+    public Vertice[][] encontrarComponentesFuertementeConectados() {
+        Pila pila = new Pila();
         
-        for (Vertice v : this.getVertices()) {
-            if (v != null && !visitados.contains(v.usuario)) {
-                dfsPaso1(v, visitados, pila);
+        String[] visitadosArr = new String[this.num_vertices]; 
+        int[] numVisitados = {0}; 
+
+        Vertice[] vertices = this.getVertices();
+        for (Vertice v : vertices) {
+            if (v != null && !contieneString(visitadosArr, numVisitados[0], v.usuario)) {
+                dfsPaso1(v, visitadosArr, numVisitados, pila);
             }
         }
         
         Grafo gTranspuesto = this.getTranspuesto();
-        visitados.clear(); 
-        List<List<Vertice>> todosLosComponentes = new ArrayList<>();
+        
+        numVisitados[0] = 0;
+        Vertice[][] todosLosComponentesTemp = new Vertice[this.num_vertices][]; 
+        int numComponentes = 0;
         
         while (!pila.isEmpty()) {
             Vertice v = pila.pop();
             Vertice vTranspuesto = gTranspuesto.buscarUsuario(v.usuario);
             
-            if (vTranspuesto != null && !visitados.contains(vTranspuesto.usuario)) {
-                List<Vertice> componenteActual = new ArrayList<>();
-                gTranspuesto.dfsPaso2(vTranspuesto, visitados, componenteActual);
-                todosLosComponentes.add(componenteActual);
+            if (vTranspuesto != null && !contieneString(visitadosArr, numVisitados[0], vTranspuesto.usuario)) {
+                Vertice[] componenteActualArr = new Vertice[this.num_vertices]; 
+                int[] numComponente = {0};
+
+                gTranspuesto.dfsPaso2(vTranspuesto, visitadosArr, numVisitados, componenteActualArr, numComponente);
+                
+                Vertice[] componenteRecortado = new Vertice[numComponente[0]];
+                for (int i = 0; i < numComponente[0]; i++) {
+                    componenteRecortado[i] = componenteActualArr[i];
+                }
+                
+                todosLosComponentesTemp[numComponentes] = componenteRecortado;
+                numComponentes++;
             }
         }
+        
+        Vertice[][] todosLosComponentes = new Vertice[numComponentes][];
+        for (int i = 0; i < numComponentes; i++) {
+            todosLosComponentes[i] = todosLosComponentesTemp[i];
+        }
+        
         return todosLosComponentes;
     }
 
-    //se obtiene un string formateado con los componentes fuertemente conectados usando el metodo anterior 
     public String getFuertementeconectados() {
         String resultadoFinal = "";
         resultadoFinal += "--- Componentes Fuertemente Conectados ---\n";
-        List<List<Vertice>> componentes = this.encontrarComponentesFuertementeConectados();
+        Vertice[][] componentes = this.encontrarComponentesFuertementeConectados();
         int i = 1;
-        for (List<Vertice> componente : componentes) {
+        for (Vertice[] componente : componentes) {
             resultadoFinal += "Componente " + i + ": { ";
             String Nodos = "";
             for (Vertice v : componente) {
-                Nodos += v.usuario + ", "; 
+                Nodos += v.usuario + ", ";
             }
             if (!Nodos.isEmpty()) {
                 Nodos = Nodos.substring(0, Nodos.length() - 2);
