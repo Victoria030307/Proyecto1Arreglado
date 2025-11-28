@@ -3,20 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package proyecto1_arreglado;
-// Importaciones de Java Swing (para la ventana)
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-
-
-//Importaciones de GraphStream (para el dibujo)
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.swing_viewer.SwingViewer;
 import org.graphstream.ui.swing_viewer.ViewPanel;
-
-// Importaciones de Java Util (para las listas)
-import java.util.List;
 
 /**
  *
