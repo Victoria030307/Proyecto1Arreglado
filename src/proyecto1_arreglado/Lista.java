@@ -2,53 +2,61 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package proyecto1_arreglado;
-
-
-import java.util.ArrayList; 
-import java.util.List;    
+package proyecto1_arreglado; 
 
 /**
  *
  * @author victo
  */
 
-/*
-Esta clase se encarga de guardar las aristas de un  vertice.
-Es decir, cada vertice tiene uan lista con el nombre de cada usario que sigue.
-
-Vertices    Lista de seguidos
-....
-@victoria  Sigue a: @juan -> @pedro (@juan seria el primero de la lista)
-*/
+/**
+ * Implementa una estructura de datos de Lista Enlazada Simple para almacenar
+ * nombres de usuarios (cadenas de texto). Se utiliza principalmente para
+ * manejar las listas de adyacencia de un vértice en el grafo.
+ */
 public class Lista {
 
     Nodo primero;
     int size;
 
+    /**
+     * Crea una lista enlazada vacía.
+     */
     public Lista() {
         this.primero = null;
         this.size = 0;
     }
 
-public boolean insertar(String dato) {
-    if (this.buscar(dato) != null) {
-        return false; 
-    }
-    Nodo nuevo = new Nodo(dato);
-    if (this.primero == null) {
-        this.primero = nuevo;
-    } else {
-        Nodo aux = this.primero;
-        while (aux.siguiente != null) {
-            aux = aux.siguiente;
+    /**
+     * Inserta un nuevo dato (nombre de usuario) al final de la lista.
+     * No permite duplicados.
+     *
+     * @param dato El nombre de usuario a insertar.
+     * @return {@code true} si se insertó el dato, {@code false} si el dato ya existía.
+     */
+    public boolean insertar(String dato) {
+        if (this.buscar(dato) != null) {
+            return false; 
         }
-        aux.siguiente = nuevo;
+        Nodo nuevo = new Nodo(dato);
+        if (this.primero == null) {
+            this.primero = nuevo;
+        } else {
+            Nodo aux = this.primero;
+            while (aux.siguiente != null) {
+                aux = aux.siguiente;
+            }
+            aux.siguiente = nuevo;
+        }
+        size++;
+        return true; 
     }
-    size++;
-    return true; 
-}
     
+    /**
+     * Elimina la primera ocurrencia de un dato (nombre de usuario) de la lista.
+     *
+     * @param dato El nombre de usuario a eliminar.
+     */
     public void eliminar(String dato) {
         Nodo aux = this.primero;
         
@@ -58,6 +66,7 @@ public boolean insertar(String dato) {
         
         if(aux.usuario.equals(dato)){
             this.primero = aux.siguiente;
+            size--; 
         } else {
             while(aux.siguiente != null && !aux.siguiente.usuario.equals(dato)){
                 aux = aux.siguiente;
@@ -72,11 +81,15 @@ public boolean insertar(String dato) {
         
         }
         
-        
     }
     
 
-public String[] getNombres() {
+    /**
+     * Devuelve todos los datos (nombres de usuario) de la lista en un arreglo de cadenas.
+     *
+     * @return Un arreglo de {@code String} con los nombres de la lista.
+     */
+    public String[] getNombres() {
         if (this.size == 0) {
             return new String[0];
         }
@@ -90,6 +103,12 @@ public String[] getNombres() {
         }
         return nombres;
     }
+    
+    /**
+     * Genera una representación en cadena de texto de todos los elementos de la lista.
+     *
+     * @return Una cadena de texto con los nombres de usuario separados por ", ".
+     */
     public String mostrar (){
         String lista = "";
         Nodo aux = this.primero;
@@ -98,10 +117,16 @@ public String[] getNombres() {
             lista += aux.usuario + ", ";
             aux = aux.siguiente;
         }
-  
+ 
         return lista;
     }
     
+    /**
+     * Busca un dato (nombre de usuario) en la lista.
+     *
+     * @param dato El nombre de usuario a buscar.
+     * @return El objeto {@code Nodo} que contiene el dato si se encuentra, o {@code null} si no existe.
+     */
     public Nodo buscar (String dato){
         Nodo aux = this.primero;
 

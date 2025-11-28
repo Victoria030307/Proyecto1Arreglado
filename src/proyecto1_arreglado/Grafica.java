@@ -16,9 +16,15 @@ import org.graphstream.ui.swing_viewer.ViewPanel;
  *
  * @author giova
  */
+/**
+ * Clase que extiende {@code javax.swing.JFrame} y se encarga de la
+ * **visualización gráfica de la red social (Grafo)** utilizando la biblioteca GraphStream.
+ * Permite mostrar los usuarios como nodos y las relaciones como aristas dirigidas,
+ * además de resaltar los Componentes Fuertemente Conectados (CFCs).
+ */
 public class Grafica extends javax.swing.JFrame {
 
-    private Grafo miGrafo;
+    private Grafo miGrafo; // El objeto Grafo a visualizar.
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -66,18 +72,29 @@ public class Grafica extends javax.swing.JFrame {
         }
         //</editor-fold>
     }
-
+/**
+     * Constructor para la clase {@code Grafica}. Inicializa la interfaz de usuario,
+     * establece el grafo a visualizar y llama al método para dibujar el grafo.
+     *
+     * @param grafo El objeto {@code Grafo} que contiene los usuarios y relaciones.
+     */
     public Grafica(Grafo grafo) {
         initComponents();
-        this.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE); 
         this.miGrafo = grafo;
         this.setTitle("Analizador de Red Social (Grafos)");
-        this.setPreferredSize(new Dimension(800, 600)); //
+        this.setPreferredSize(new Dimension(800, 600)); 
         this.pack();
         this.setLocationRelativeTo(null);
         dibujarGrafo();
     }
-
+    
+    /**
+     * Configura y dibuja la estructura del grafo en el panel de la ventana utilizando
+     * la librería GraphStream. Los vértices se representan como nodos y las aristas
+     * como enlaces dirigidos. Los Componentes Fuertemente Conectados (CFCs) 
+     * se resaltan con diferentes colores. 
+     */
     private void dibujarGrafo() {
 
         if (miGrafo == null) {

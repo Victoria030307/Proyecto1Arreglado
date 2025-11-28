@@ -9,18 +9,24 @@ package proyecto1_arreglado;
  * @author victo
  */
 
-/*
-La clase de Nodo sirve para guardar cada una dee las Aristas de cada vertice
-Es decir, guardan al usuario que sigue
-Vertices    Lista de seguidos
-....
-@victoria  Sigue a: @juan -> @pedro (Juan y Pedro serian los nodos de la lista de seguidos)
-
-*/
+/**
+ * Representa un nodo en una **Lista Enlazada Simple** (como la clase {@code Lista}),
+ * utilizado específicamente para almacenar el nombre de un usuario o una arista
+ * de adyacencia en el contexto de un grafo de red social.
+ * 
+ */
 public class Nodo {
+    /** Referencia al siguiente nodo en la lista. */
     Nodo siguiente;
+    /** El dato almacenado en el nodo, que representa el nombre de un usuario. */
     String usuario;
     
+    /**
+     * Crea una nueva instancia de {@code Nodo} inicializando el campo de usuario.
+     * El puntero {@code siguiente} se establece inicialmente en {@code null}.
+     *
+     * @param dato El nombre de usuario que será almacenado en el nodo.
+     */
     public Nodo (String dato){
         this.siguiente = null;
         this.usuario = dato;
