@@ -218,7 +218,7 @@ public class Ventana extends javax.swing.JFrame {
     private void botonCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCargarActionPerformed
      nuevo = GestorArchivos.cargarGrafoDesdeArchivo();
      if (nuevo!= null) {
-        JOptionPane.showMessageDialog(this, "Grafo cargado exitosamente. " + nuevo.getVertices().size() + " usuarios encontrados.");
+        JOptionPane.showMessageDialog(this, "Grafo cargado exitosamente. " + nuevo.getVertices().length + " usuarios encontrados.");
         CFC.setText("Grafo cargado. Listo para analizar.");
       }
     }//GEN-LAST:event_botonCargarActionPerformed
