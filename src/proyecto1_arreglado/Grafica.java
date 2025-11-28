@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package proyecto1_arreglado;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import org.graphstream.graph.Graph;
@@ -16,7 +17,7 @@ import org.graphstream.ui.swing_viewer.ViewPanel;
  * @author giova
  */
 public class Grafica extends javax.swing.JFrame {
-   
+
     private Grafo miGrafo;
 
     /**
@@ -38,7 +39,7 @@ public class Grafica extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-/**
+    /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -64,61 +65,69 @@ public class Grafica extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Grafica.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-    }   
-
-    //constructor de la clase crea una grafica con un grafo, es decir, recibe un grafo construido como entrada
-    public Grafica(Grafo grafo) {
-        initComponents(); 
-        this.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
-        this.miGrafo = grafo; 
-        this.setTitle("Analizador de Red Social (Grafos)");
-        this.setPreferredSize(new Dimension(800, 600)); //
-        this.pack(); 
-        this.setLocationRelativeTo(null); 
-        dibujarGrafo();       
     }
 
-    //este metodo dibuja o crea la representacion grafica del grafo utiliza los getters del grafo que recibe el constructor para determinar los vertices y mediante los componentes fuertemente conectados crea el diseño
+    public Grafica(Grafo grafo) {
+        initComponents();
+        this.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+        this.miGrafo = grafo;
+        this.setTitle("Analizador de Red Social (Grafos)");
+        this.setPreferredSize(new Dimension(800, 600)); //
+        this.pack();
+        this.setLocationRelativeTo(null);
+        dibujarGrafo();
+    }
+
     private void dibujarGrafo() {
+
         if (miGrafo == null) {
             return;
         }
+
         System.setProperty("org.graphstream.ui", "swing");
         Graph graph = new SingleGraph("RedSocial");
-        String stylesheet = "graph {"+"fill-color:#222222;"+"}"+"node{"+"text-size: 25px;"+"text-color:white;"+"}";
+        String stylesheet = "graph {" + "fill-color:#222222;" + "}" + "node{" + "text-size: 25px;" + "text-color:white;" + "}";
         graph.setAttribute("ui.stylesheet", stylesheet);
-        graph.setAttribute("ui.stylesheet", stylesheet);
-        
-        for (Vertice v : miGrafo.getVertices()) {
+
+        Vertice[] vertices = miGrafo.getVertices();
+        for (Vertice v : vertices) {
             graph.addNode(v.usuario).setAttribute("ui.label", v.usuario);
         }
-        int edgeId = 0; 
-        for (Vertice v : miGrafo.getVertices()) {
-            for (String adyacente : v.adyacentes.getNombres()) {
+
+        int edgeId = 0;
+        for (Vertice v : vertices) {
+            String[] nombresAdyacentes = v.adyacentes.getNombres();
+            for (String adyacente : nombresAdyacentes) {
                 if (graph.getNode(adyacente) != null) {
                     graph.addEdge(String.valueOf(edgeId++), v.usuario, adyacente, true);
                 }
             }
         }
-        List<List<Vertice>> componentes = miGrafo.encontrarComponentesFuertementeConectados();
+
+        Vertice[][] componentes = miGrafo.encontrarComponentesFuertementeConectados();
+
         String[] colores = {"red", "blue", "green", "gold", "purple", "orange", "cyan", "pink"};
         int colorIndex = 0;
-        for (List<Vertice> componente : componentes) {
+        for (Vertice[] componente : componentes) {
             String color = colores[colorIndex % colores.length];
             colorIndex++;
             for (Vertice v : componente) {
-            graph.getNode(v.usuario).setAttribute("ui.style", "fill-color: " + color + ";");
+                if (graph.getNode(v.usuario) != null) {
+                    graph.getNode(v.usuario).setAttribute("ui.style", "fill-color: " + color + ";");
+                }
             }
         }
+
         Viewer viewer = new SwingViewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
-        viewer.enableAutoLayout(); 
-        ViewPanel viewPanel = (ViewPanel) viewer.addDefaultView(false); 
+        viewer.enableAutoLayout();
+        ViewPanel viewPanel = (ViewPanel) viewer.addDefaultView(false);
+
         panelParaGrafo.setLayout(new BorderLayout());
         panelParaGrafo.add(viewPanel, BorderLayout.CENTER);
         panelParaGrafo.revalidate();
         panelParaGrafo.repaint();
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel panelParaGrafo;
     // End of variables declaration//GEN-END:variables
